@@ -1,89 +1,97 @@
 package com.sparkstreaminganalytics.twitter;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
 
-import org.apache.spark.*;
-import org.apache.spark.api.java.JavaRDD;
+// Twitter library
+import twitter4j.Status;
+import twitter4j.TwitterException;
+import twitter4j.TwitterStream;
+import twitter4j.TwitterStreamFactory;
+import twitter4j.conf.ConfigurationBuilder;
+
+// Spark
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.*;
 import org.apache.spark.streaming.*;
-import org.apache.spark.streaming.api.java.*;
-import scala.Tuple2;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.twitter.TwitterUtils;
 
-import org.elasticsearch.spark.streaming.api.java.JavaEsSparkStreaming;
-import org.json.JSONObject;
-import org.spark_project.guava.collect.ImmutableList; 
+// Google API for manipulation JSON objects.
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
-public class Scraper{
+/**
+ *
+ * @author Veselin Kirev
+ */
+public class Scraper {
 	private static final String appName = "TwitterAnalyzer";
 	private static final String master = "local[2]";
-	
-	public static void main(String[] args) throws InterruptedException{
-		
-		String json1 = "{\"created_at\":\"Sat Dec 26 11:55:29 +0000 2016\", \"id\":802495994143252483,\"source\":\"\\u003ca href=\\\"http:\\/\\/twitter.com\\/download\\/android\\\" rel=\\\"nofollow\\\"\\u003eTwitter for Android\\u003c\\/a\\u003e\",\"user\":{\"id\":3,\"name\":\"Orval\\u2122\",\"followers_count\":267,\"friends_count\":296},\"geo\":null,\"coordinates\":null,\"place\":{\"place_type\":\"admin\",\"full_name\":\"Arizona, USA\",\"country\":\"United States\"},\"retweet_count\":0,\"favorite_count\":0,\"entities\":{\"hashtags\":[{\"text\":\"USCvsCLEM\",\"indices\":[8,18]}],\"urls\":[{\"url\":\"https:\\/\\/t.co\\/eI4p3k51JK\",\"expanded_url\":\"https:\\/\\/cards.twitter.com\\/cards\\/18ce548tywy\\/2nxml\",\"display_url\":\"cards.twitter.com\\/cards\\/18ce548t\\u2026\",\"indices\":[117,140]}]},\"timestamp_ms\":\"1483032250000\"}"; 
-		String json2 = "{\"created_at\":\"Sat Dec 26 12:55:14 +0000 2016\", \"id\":802495994143252484,\"source\":\"\\u003ca href=\\\"http:\\/\\/twitter.com\\/download\\/android\\\" rel=\\\"nofollow\\\"\\u003eTwitter for Android\\u003c\\/a\\u003e\",\"user\":{\"id\":4,\"name\":\"Orval\\u2122\",\"followers_count\":267,\"friends_count\":296},\"geo\":null,\"coordinates\":null,\"place\":{\"place_type\":\"admin\",\"full_name\":\"Arizona, USA\",\"country\":\"United States\"},\"retweet_count\":0,\"favorite_count\":0,\"entities\":{\"hashtags\":[{\"text\":\"Test\",\"indices\":[8,13]}],\"urls\":[{\"url\":\"https:\\/\\/t.co\\/eI4p3k51JK\",\"expanded_url\":\"https:\\/\\/cards.twitter.com\\/cards\\/18ce548tywy\\/2nxml\",\"display_url\":\"cards.twitter.com\\/cards\\/18ce548t\\u2026\",\"indices\":[114,137]}]},\"timestamp_ms\":\"1482032250000\"}"; 
-		
-		//JSONObject jsonObj = new JSONObject(json2);
-		//jsonObj.remove("created_at");
-		//System.out.println(jsonObj.toString());
-//	}
 
-		
+	// Gson API is a Google API used for conversion Java and JSON objects.
+	// Use this if you want to get location=null as well or other nulls
+	// private static Gson gson = new GsonBuilder().serializeNulls().create();
+	private static Gson gson = new GsonBuilder().setExclusionStrategies(new TestExclStrat()).create();
+
+	/**
+	 * @param args
+	 *            the command line arguments
+	 */
+	public static void main(String[] args) throws IOException, TwitterException {
+		// Using non-default cb to create Twitter object, where JSON store is
+		// enabled.
+		// Otherwise Status object cannot be converted to raw JSON.
+		ConfigurationBuilder cb = new ConfigurationBuilder();
+		cb.setJSONStoreEnabled(true);
+		TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+
+		// Keywords.
+		String keywords[] = { "Demexit" };
+
+		// Spark configuration
 		SparkConf conf = new SparkConf().setAppName(appName).setMaster(master);
-		conf.set("es.index.auto.create", "true");
+		// conf.set("es.index.auto.create", "true");
 		JavaSparkContext jsc = new JavaSparkContext(conf);
+		// Configure log level here. For debugging comment out this code.
+		jsc.setLogLevel("OFF");
 		JavaStreamingContext jssc = new JavaStreamingContext(jsc, Durations.seconds(10));
-		
-		
-		//String json1 = "{\"reason\" : \"business\",\"airport\" : \"SFO\"}";  
-		//String json2 = "{\"participants\" : 5,\"airport\" : \"OTP\"}";
 
-		JavaRDD<String> stringRDD = jsc.parallelize(ImmutableList.of(json1, json2));
-		Queue<JavaRDD<String>> microbatches = new LinkedList<JavaRDD<String>>();      
-		microbatches.add(stringRDD);
-		JavaDStream<String> stringDStream = jssc.queueStream(microbatches);
-		
-		
-		// My fix applied here. Put stringDStream instead of stringRDD.
-		JavaEsSparkStreaming.saveJsonToEs(stringDStream, "twitter/tweet");    
-		
-//		jssc.start();  
-		
-//		JavaReceiverInputDStream<String> lines = jssc.socketTextStream("localhost", 9999);
-//		
-//		// Split each line into words
-//		JavaDStream<Map<String,?> words = lines.flatMap(
-//		  new FlatMapFunction<String, String>() { // Note this is an Anonymous Java class!!!
-//		    @Override
-//		    public Iterator<String> call(String x) {
-//		    	return Arrays.asList(x.split(" ")).iterator();
-//		    }
-//		  });
-//		
-//		// Make pairs from just the words. The Map Reduce mapper principle is used here.
-//		JavaPairDStream<String, Integer> pairs = words.mapToPair(
-//				new PairFunction<String, String, Integer>(){
-//					@Override
-//					public Tuple2<String, Integer> call(String s){
-//						return new Tuple2<>(s, 1);
-//					}
-//				});
-//		
-//		// Count each word in each batch
-//		JavaPairDStream<String, Integer> wordCounts = pairs.reduceByKey(
-//		  new Function2<Integer, Integer, Integer>() {
-//		    @Override public Integer call(Integer i1, Integer i2) {
-//		      return i1 + i2;
-//		    }
-//		  });
-//
-//		// Print the first ten elements of each RDD generated in this DStream to the console
-//		wordCounts.print();
-		
-		jssc.start();              // Start the computation
-		jssc.awaitTermination();   // Wait for the computation to terminate
-}
+		JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(jssc, keywords);
+
+		// Filter: get only tweets in English.
+		JavaDStream<Status> englishStatuses = stream.filter(new Function<Status, Boolean>() {
+			@Override
+			public Boolean call(Status status) {
+				return status.getLang().equals("en");
+			}
+		});
+
+		JavaDStream<String> cleanedTweets = englishStatuses.flatMap(new FlatMapFunction<Status, String>() {
+			// Handle this exception later on instead of throwing it.
+			@Override
+			public Iterator<String> call(Status status) throws TwitterException { 
+				String statusJSONString = gson.toJson(status);
+				JsonElement jsonElement = gson.fromJson(statusJSONString, JsonElement.class);
+				JsonObject statusJSONObject = jsonElement.getAsJsonObject();
+				return Arrays.asList(statusJSONObject.toString() + "\n").iterator();
+			}
+		});
+
+		cleanedTweets.print();
+
+		jssc.start();
+		try {
+			jssc.awaitTermination();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }
