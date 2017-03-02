@@ -20,8 +20,8 @@ public class TestExclStrat implements ExclusionStrategy {
 	        case "inReplyToUserId":  return true;
 	        case "isFavorited":  return true;
 	        case "isRetweeted":  return true;
-	        case "favoriteCount": return true;
-	        case "retweetCount": return true;
+	        //case "favoriteCount": return true;
+	        //case "retweetCount": return true;
 	        case "isPossiblySensitive":  return true;
 	        case "lang":  return true;
 	        case "contributorsIDs":  return true;
