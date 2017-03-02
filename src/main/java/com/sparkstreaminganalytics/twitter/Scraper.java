@@ -88,7 +88,9 @@ public class Scraper {
 //		//DeleteIndexResponse deleteResponse = client.admin().indices().delete(new DeleteIndexRequest("twitter")).actionGet();
 //		GetResponse response = client.prepareGet("twitter", "tweet", "836336600493641728").get();
 	
-
+		// Initialize the NLP
+		NLP.init();
+		
 		// Keywords.
 		String keywords[] = { "trump" };
 
@@ -132,7 +134,7 @@ public class Scraper {
 		            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		            Date theDate = sdf.parse(jsonObj.getString("createdAt"));
 		            String newstring = new SimpleDateFormat(elasticDateFormat).format(theDate);
-		            System.out.println(newstring);
+		            //System.out.println(newstring);
 		            jsonObj.put("createdAt", newstring);
 		            
 		        }
@@ -162,11 +164,13 @@ public class Scraper {
 						}
 					}
 				}
+				
+				jsonObj.put("sentiment", NLP.findSentiment(jsonObj.getString("text")));
 				return Arrays.asList(jsonObj.toString() + "\n").iterator();
 			}
 		});
-		JavaEsSparkStreaming.saveJsonToEs(cleanedTweets, "tweets/tweet");    
-		//cleanedTweets.print();
+		//JavaEsSparkStreaming.saveJsonToEs(cleanedTweets, "tweets/tweet");    
+		cleanedTweets.print();
 
 		jssc.start();
 		
