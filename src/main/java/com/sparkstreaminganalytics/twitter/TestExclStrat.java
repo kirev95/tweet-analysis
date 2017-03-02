@@ -6,13 +6,15 @@ import com.google.gson.FieldAttributes;
 import twitter4j.Status;
 
 public class TestExclStrat implements ExclusionStrategy {
-
+	
+	// Do not skip classes.
     public boolean shouldSkipClass(Class<?> arg0) {
         return false;
     }
-
+    
+    // Define which fields to be skipped while serialising a Status object
+    // into a JSON object for efficiency.
     public boolean shouldSkipField(FieldAttributes f) {
-//    	return false;
     	switch (f.getName()) {
 	        case "source":  return true;
 	        case "isTruncated":  return true;

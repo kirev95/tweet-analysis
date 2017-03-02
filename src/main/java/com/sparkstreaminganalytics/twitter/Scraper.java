@@ -65,6 +65,24 @@ public class Scraper {
 		}
 		return localesObj;
 	}
+	
+	// Clean the tweet data to enhance the efficiency of the sentiment analysis.
+	private static String getCleanedTextTweet(String originalTweet){
+		String cleanTweet = originalTweet.replaceAll("\n", "")
+				  // Remove Retweets
+			      .replaceAll("RT\\s+", "")
+			      // Remove Mentions which follow a word
+			      .replaceAll("\\s+@\\w+", "")
+			      // Remove Mentions at the begining
+			      .replaceAll("@\\w+", "")
+			      // Remove URL
+			      .replaceAll("((www\\.[^\\s]+)|(https?://[^\\s]+))", "")
+			      // Remove other useless symbols, inlcuding the # from the hashtag
+				  .replaceAll("[*#@<>]", "");
+		
+		return cleanTweet;
+	}
+	
 	// Gson API is a Google API used for conversion Java and JSON objects.
 	// Use this if you want to get location=null as well or other nulls
 	// private static Gson gson = new GsonBuilder().serializeNulls().create();
@@ -118,15 +136,11 @@ public class Scraper {
 			// Handle this exception later on instead of throwing it.
 			@Override
 			public Iterator<String> call(Status status) throws TwitterException {
-
-				//long timestamp = status.getCreatedAt().getTime();
-				//System.out.println(timestamp);
+				// Serialize the Status object into JSON object.
 				String statusJSONString = gson.toJson(status);
 				
 				// Add timestamp to the object, converting the Date object to timestamp_ms
 				JSONObject jsonObj = new JSONObject(statusJSONString);
-				
-				//jsonObj.put("timestamp", timestamp);
 				
 				//Process date:
 				try{
@@ -134,7 +148,6 @@ public class Scraper {
 		            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		            Date theDate = sdf.parse(jsonObj.getString("createdAt"));
 		            String newstring = new SimpleDateFormat(elasticDateFormat).format(theDate);
-		            //System.out.println(newstring);
 		            jsonObj.put("createdAt", newstring);
 		            
 		        }
@@ -165,7 +178,7 @@ public class Scraper {
 					}
 				}
 				
-				jsonObj.put("sentiment", NLP.findSentiment(jsonObj.getString("text")));
+				jsonObj.put("sentiment", NLP.findSentiment(getCleanedTextTweet(jsonObj.getString("text"))));
 				return Arrays.asList(jsonObj.toString() + "\n").iterator();
 			}
 		});
