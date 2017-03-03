@@ -110,7 +110,7 @@ public class Scraper {
 		NLP.init();
 		
 		// Keywords.
-		String keywords[] = { "trump" };
+		String keywords[] = { "win" };
 
 		// Spark configuration
 		SparkConf conf = new SparkConf().setAppName(appName).setMaster(master);
@@ -127,12 +127,15 @@ public class Scraper {
 		JavaDStream<Status> englishStatuses = stream.filter(new Function<Status, Boolean>() {
 			@Override
 			public Boolean call(Status status) {
-				return status.getLang().equals("en");
+				if(SpamFilter.isSpam(status)){
+					System.out.println("SPAM##################################################################");
+				}
+				return status.getLang().equals("en") && !(SpamFilter.isSpam(status));
 			}
 		});
 		
 		// 
-		JavaDStream<String> cleanedTweets = englishStatuses.flatMap(new FlatMapFunction<Status, String>() {
+		JavaDStream<String> processedTweets = englishStatuses.flatMap(new FlatMapFunction<Status, String>() {
 			// Handle this exception later on instead of throwing it.
 			@Override
 			public Iterator<String> call(Status status) throws TwitterException {
@@ -167,7 +170,6 @@ public class Scraper {
 						tmpUserLocation = status.getUser().getLocation();
 						tmpUserLocation.replaceAll("\\b" + "UK" + "\\b", "GB");
 						tmpCountryCode = countryObject.getCountry();
-						
 						tmpCountryName = countryObject.getDisplayCountry();
 						
 						if(tmpUserLocation.contains(tmpCountryCode)
@@ -178,12 +180,15 @@ public class Scraper {
 					}
 				}
 				
+				// Add the sentiment to the Tweet JSON object
 				jsonObj.put("sentiment", NLP.findSentiment(getCleanedTextTweet(jsonObj.getString("text"))));
+				
 				return Arrays.asList(jsonObj.toString() + "\n").iterator();
 			}
 		});
-		//JavaEsSparkStreaming.saveJsonToEs(cleanedTweets, "tweets/tweet");    
-		cleanedTweets.print();
+		
+		//JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");    
+		processedTweets.print();
 
 		jssc.start();
 		
