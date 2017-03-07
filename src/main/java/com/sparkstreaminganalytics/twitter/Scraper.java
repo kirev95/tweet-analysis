@@ -1,8 +1,6 @@
 package com.sparkstreaminganalytics.twitter;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,8 +11,6 @@ import java.util.TimeZone;
 // Twitter library
 import twitter4j.Status;
 import twitter4j.TwitterException;
-import twitter4j.TwitterStream;
-import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 // Spark
@@ -27,21 +23,12 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.twitter.TwitterUtils;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.spark.streaming.api.java.JavaEsSparkStreaming;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.JSONObject;
 
 // Google API for manipulation JSON objects.
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 /**
  *
@@ -93,24 +80,33 @@ public class Scraper {
 	 *            the command line arguments
 	 */
 	public static void main(String[] args) throws IOException, TwitterException {
+		if(args.length != 1){
+			throw new IllegalArgumentException("Invalid input. Please enter exactly 1 keyword.");
+		}
 		// Using non-default cb to create Twitter object, where JSON store is
 		// enabled.
 		// Otherwise Status object cannot be converted to raw JSON.
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setJSONStoreEnabled(true);
-		TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+
 		
-//		TransportClient client = new PreBuiltTransportClient(Settings.EMPTY)
-//		        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-//		
-//		//DeleteIndexResponse deleteResponse = client.admin().indices().delete(new DeleteIndexRequest("twitter")).actionGet();
-//		GetResponse response = client.prepareGet("twitter", "tweet", "836336600493641728").get();
+		// Delete all documents from the elasticsearch index "tweets" of type "tweet".
+		// TODO: Find a way to verify that elasticsearch is actually run.
+		ProcessBuilder p=new ProcessBuilder("curl","-XPOST", "localhost:9200/tweets/tweet/_delete_by_query?conflicts=proceed&pretty","-H",
+                "Content-Type: application/json","Accept: application/json", "-d", "{ \"query\": { \"match_all\": {} } }");
+		try {
+			final Process shell = p.start();
+		} catch (IOException e) {
+			System.err.println("Something went wrong when trying to delete all documents from ES index. Start the program again.");
+			e.printStackTrace();
+			System.exit(0);
+		}
 	
 		// Initialize the NLP
 		NLP.init();
 		
-		// Keywords.
-		String keywords[] = { "win" };
+		// Keyword obtained from user input.
+		String keywords[] = { args[0] };
 
 		// Spark configuration
 		SparkConf conf = new SparkConf().setAppName(appName).setMaster(master);
@@ -121,7 +117,6 @@ public class Scraper {
 		JavaStreamingContext jssc = new JavaStreamingContext(jsc, Durations.seconds(10));
 
 		JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(jssc, keywords);
-		System.out.println("");
 		
 		// Filter: get only tweets in English.
 		JavaDStream<Status> englishStatuses = stream.filter(new Function<Status, Boolean>() {
@@ -187,8 +182,8 @@ public class Scraper {
 			}
 		});
 		
-		//JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");    
-		processedTweets.print();
+		JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");    
+		//processedTweets.print();
 
 		jssc.start();
 		

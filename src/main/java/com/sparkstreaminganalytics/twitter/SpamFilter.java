@@ -10,41 +10,65 @@ import twitter4j.Status;
 import twitter4j.User;
 
 public class SpamFilter {
-	
+	private static int[] countArr = new int[8];
+	private static int numberOfStatusesChecked = 0;
+	private static int identifiedSpam = 0;
 	// Returns true if the status is spam.
 	public static boolean isSpam(Status status){
 		double spamProbability = calculateSpamProbability(status);
-		double threshold = 0.5;
-				System.out.println("Status: " + status.toString());
+		double threshold = 0.25;
+			System.out.println("Status: " + status.toString());
 			System.out.println("Spam probability: " + spamProbability);
 		
-		return spamProbability > threshold;
+		return spamProbability >= threshold;
 	}
 	
 	private static double calculateSpamProbability(Status status) {
+		numberOfStatusesChecked++;
 		
 		// Get the numerical value of the boolean result for each calculation.
-		//int isRecentlyCreated = isRecentlyCreated(status.getUser()) ? 1 : 0;
+		int isRecentlyCreated = isRecentlyCreated(status.getUser()) ? 1 : 0;
 		int isCreatingLittleContent = isCreatingLittleContent(status.getUser()) ? 1 : 0;
 		int hasAFewFollowers = hasAFewFollowers(status.getUser()) ? 1 : 0;
 		int hasShortDescription = hasShortDescription(status.getUser()) ? 1 : 0;
-		//int containsBotFriendlyContentSources = containsBotFriendlyContentSources(status) ? 1 : 0;
+		int containsBotFriendlyContentSources = containsBotFriendlyContentSources(status) ? 1 : 0;
 		int hasManyHashtags = hasManyHashtags(status) ? 1 : 0;
 		int hasShortContentLength = hasShortContentLength(status) ? 1 : 0;
 		int requestsRetweetOrFollow = requestsRetweetOrFollow(status) ? 1 : 0;
 		
-		int numberOfFeatures = 6;
-//		System.out.println("####################################");
-//		System.out.println(isRecentlyCreated + " " + isCreatingLittleContent + " " + hasAFewFollowers + " " + hasShortDescription + " "
-//				+ containsBotFriendlyContentSources + " " + hasManyHashtags + " " + hasShortContentLength + " "
-//				+ requestsRetweetOrFollow);
-//		System.out.println("####################################");
+		int numberOfFeatures = 8;
+		
+		double probability = (isRecentlyCreated + isCreatingLittleContent + hasAFewFollowers + hasShortDescription
+				+ containsBotFriendlyContentSources + hasManyHashtags + hasShortContentLength
+				+ requestsRetweetOrFollow) / (double)numberOfFeatures;
+		
+		System.out.println("####################################");
+		System.out.println(isRecentlyCreated + " " + isCreatingLittleContent + " " + hasAFewFollowers + " " + hasShortDescription + " "
+				+ containsBotFriendlyContentSources + " " + hasManyHashtags + " " + hasShortContentLength + " "
+				+ requestsRetweetOrFollow);
+		System.out.println("Count Arr: " + evaluateFeatures(isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
+				, containsBotFriendlyContentSources , hasManyHashtags , hasShortContentLength
+				, requestsRetweetOrFollow));
+		
+		System.out.println("Statuses checked: " + numberOfStatusesChecked);
+		
+		if(probability > 0){
+			identifiedSpam++;
+			System.out.println("Identified as SPAM: " + identifiedSpam);
+		}
+		System.out.println("####################################");
 		// Assume that all features are equally important.
-		double probability = (/*isRecentlyCreated +*/ isCreatingLittleContent + hasAFewFollowers + hasShortDescription
-							/*+ containsBotFriendlyContentSources*/ + hasManyHashtags + hasShortContentLength
-							+ requestsRetweetOrFollow) / (double)numberOfFeatures;
+		
 		
 		return probability;
+	}
+	
+	private static String evaluateFeatures(int ... features){	
+		for(int i=0; i<8; i++){
+			countArr[i] += features[i];
+		}
+		
+		return java.util.Arrays.toString(countArr);
 	}
 	
 	// Feature 1: Asking for RT or Follow
