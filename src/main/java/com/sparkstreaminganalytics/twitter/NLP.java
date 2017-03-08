@@ -1,6 +1,9 @@
 package com.sparkstreaminganalytics.twitter;
 
+import java.util.HashMap;
 import java.util.Properties;
+
+
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -13,6 +16,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class NLP {
 	static StanfordCoreNLP pipeline;
 	static Properties properties;
+	static HashMap<Integer, Integer[]> sentimentDifferenceMap = new HashMap<Integer, Integer[]>();
 	
 	public static int numberOfUnknowns;
 	
@@ -21,6 +25,16 @@ public class NLP {
 		properties = new Properties();
 		properties.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
 		pipeline = new StanfordCoreNLP(properties);
+		
+		for(int i=0; i<5; i++){
+			sentimentDifferenceMap.put(i, new Integer[5]);
+		}
+		
+		for(int notClTweetSentScoreIndex=0; notClTweetSentScoreIndex<5; notClTweetSentScoreIndex++){
+			for(int clTweetSentScoreIndex=0; clTweetSentScoreIndex<5; clTweetSentScoreIndex++){
+				sentimentDifferenceMap.get(notClTweetSentScoreIndex)[clTweetSentScoreIndex] = new Integer(0);
+			}
+		}
 	}
 	
 	// Clean the tweet data to enhance the efficiency of the sentiment analysis.
@@ -40,16 +54,17 @@ public class NLP {
 		return cleanTweet;
 	}
 
-	public static String findUsefulSentiment(String tweet){
-		String notCleanedTextSentiment = findSentiment(tweet);
-		String cleanedTextSentiment = findSentiment(getCleanedTextTweet(tweet));
-		
-		if(cleanedTextSentiment.equals(notCleanedTextSentiment)){
+	public static int findUsefulSentiment(String tweet){
+		int notCleanedTextSentiment = findSentiment(tweet);
+		int cleanedTextSentiment = findSentiment(getCleanedTextTweet(tweet));
+		calculateSentimentDifference(cleanedTextSentiment, notCleanedTextSentiment);
+		if(cleanedTextSentiment == notCleanedTextSentiment){
 			return cleanedTextSentiment;
 		}
 		else{
 			numberOfUnknowns++;
-			return "Unknown";
+			// Five(5) is the score for Unknown
+			return 5;
 		}
 	}
 	
@@ -58,7 +73,7 @@ public class NLP {
 	The Stanford CoreNLP Natural Language Processing Toolkit In Proceedings of the 52nd Annual Meeting of
 	the Association for Computational Linguistics: System Demonstrations, pp. 55-60.
 	 */
-	public static String findSentiment(String tweet) {
+	public static int findSentiment(String tweet) {
 		int mainSentiment = 0;
 		if (tweet != null && tweet.length() > 0) {
 			int longest = 0;
@@ -77,8 +92,12 @@ public class NLP {
 			}
 		}
 		
-		// Obtain a human readable form of the sentiment score.
-		switch (mainSentiment) {
+		return mainSentiment;
+	}
+	
+	public static String scoreToString(int sentimentScore){
+		//Obtain a human readable form of the sentiment score.
+		switch (sentimentScore) {
         case 0:
             return "Very Negative";
         case 1:
@@ -89,8 +108,16 @@ public class NLP {
             return "Positive";
         case 4:
             return "Very Positive";
+        case 5:
+            return "Unknown";
         default:
             return "";
         }
+	}
+	
+	public static void calculateSentimentDifference(int cleanedTextSentiment, int notCleanedTextSentiment){
+		if(sentimentDifferenceMap.containsKey(notCleanedTextSentiment)){
+			sentimentDifferenceMap.get(notCleanedTextSentiment)[cleanedTextSentiment]++;
+		}
 	}
 }

@@ -128,7 +128,7 @@ public class Scraper {
 				
 				System.out.println("\n************************************\n");
 				System.out.println("Total messages passed the EN & SPAM filter: " + totalStatusesPassedEnSpamFilter);
-				System.out.println("####################################\n");
+				
 				return status.getLang().equals("en") && !statusIsSpam;
 			}
 		});
@@ -179,11 +179,24 @@ public class Scraper {
 					}
 				}
 				
-				System.out.println("Statuses with sensible locations: " + sensibleLocations + " out of " + totalStatusesPassedEnSpamFilter);
 				
 				// Add the sentiment to the Tweet JSON object
-				jsonObj.put("sentiment", NLP.findUsefulSentiment(jsonObj.getString("text")));
+				jsonObj.put("sentiment", NLP.scoreToString(NLP.findUsefulSentiment(jsonObj.getString("text"))));
+				
+				System.out.println("Statuses with sensible locations: " + sensibleLocations + " out of " + totalStatusesPassedEnSpamFilter);
 				System.out.println("Statuses with unknown sentiments: " + NLP.numberOfUnknowns);
+				
+				if(NLP.numberOfUnknowns > 0){
+					for(int notClTweetSentScoreIndex=0; notClTweetSentScoreIndex<5; notClTweetSentScoreIndex++){
+						for(int clTweetSentScoreIndex=0; clTweetSentScoreIndex<5; clTweetSentScoreIndex++){
+							System.out.println(NLP.scoreToString(notClTweetSentScoreIndex)
+									+ " -> " + NLP.scoreToString(clTweetSentScoreIndex)
+									+ " : " + NLP.sentimentDifferenceMap.get(notClTweetSentScoreIndex)[clTweetSentScoreIndex]);
+						}
+					}
+				}
+				
+				System.out.println("####################################\n");
 				return Arrays.asList(jsonObj.toString() + "\n").iterator();
 			}
 		});
