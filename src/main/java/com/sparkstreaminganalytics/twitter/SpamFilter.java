@@ -13,12 +13,18 @@ public class SpamFilter {
 	private static int[] countArr = new int[8];
 	private static int numberOfStatusesChecked = 0;
 	private static int identifiedSpam = 0;
+	private static boolean isCurrentStatusSpam = false;
+	private static final double threshold = 0.5;
+	private static double avgProbabilityToSeeSpamMessage = 0;
+	private static double probabilityToSeeSpamMessage = 0;
+	
 	// Returns true if the status is spam.
 	public static boolean isSpam(Status status){
+		isCurrentStatusSpam = false;
+		System.out.println("####################################");
 		double spamProbability = calculateSpamProbability(status);
-		double threshold = 0.25;
-			System.out.println("Status: " + status.toString());
-			System.out.println("Spam probability: " + spamProbability);
+		System.out.println("Status: " + status.toString());
+		System.out.println("Spam probability: " + spamProbability);
 		
 		return spamProbability >= threshold;
 	}
@@ -42,23 +48,48 @@ public class SpamFilter {
 				+ containsBotFriendlyContentSources + hasManyHashtags + hasShortContentLength
 				+ requestsRetweetOrFollow) / (double)numberOfFeatures;
 		
-		System.out.println("####################################");
-		System.out.println(isRecentlyCreated + " " + isCreatingLittleContent + " " + hasAFewFollowers + " " + hasShortDescription + " "
-				+ containsBotFriendlyContentSources + " " + hasManyHashtags + " " + hasShortContentLength + " "
-				+ requestsRetweetOrFollow);
-		System.out.println("Count Arr: " + evaluateFeatures(isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
+		// In this way: 2 features = 0.5
+		// 3 features = 0.61 etc...
+		// So 2 features are enough to say that it is a spam.
+		if(probability != 0){
+			probability = Math.sqrt(1 / probability) * probability;
+		}
+		
+		if(probability >= threshold){
+			identifiedSpam++;
+			isCurrentStatusSpam = true;
+		}
+		
+		// Calculate average the average probability to see a SPAM message.
+		if(identifiedSpam >= 1 && numberOfStatusesChecked > 1){
+			probabilityToSeeSpamMessage = identifiedSpam / (double) numberOfStatusesChecked;
+			avgProbabilityToSeeSpamMessage = ((avgProbabilityToSeeSpamMessage*(double)(numberOfStatusesChecked-1)) + probability) / (double) numberOfStatusesChecked;
+			
+		}
+		else if(identifiedSpam == 0 && numberOfStatusesChecked >= 1){
+			avgProbabilityToSeeSpamMessage = 0;
+		}
+		else{
+			avgProbabilityToSeeSpamMessage = 1;
+		}
+		
+		// Print the statistics.
+		System.out.println("This tweet spam statistics:");
+		System.out.println("Is this status a spam?: " + (isCurrentStatusSpam ? "Yes" : "No"));
+		
+		System.out.format("%16s%16s%17s%19s%13s%15s%15s%20s \n", "Recently created", "Little content", "A few followers", "Short description", "Bot sources", "Many hashtags", "Short content", "Reqeusts RT/follow");
+		System.out.format("%16d%16d%17d%19d%13d%15d%15d%20d \n", isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
+				, containsBotFriendlyContentSources , hasManyHashtags , hasShortContentLength
+				, requestsRetweetOrFollow);
+		System.out.println("\n************************************\n");
+		System.out.println("All tweets spam statistics:");
+		System.out.println("\nFeatures counter: " + evaluateFeatures(isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
 				, containsBotFriendlyContentSources , hasManyHashtags , hasShortContentLength
 				, requestsRetweetOrFollow));
 		
 		System.out.println("Statuses checked: " + numberOfStatusesChecked);
-		
-		if(probability > 0){
-			identifiedSpam++;
-			System.out.println("Identified as SPAM: " + identifiedSpam);
-		}
-		System.out.println("####################################");
-		// Assume that all features are equally important.
-		
+		System.out.println("Total messages identified as SPAM so far: " + identifiedSpam);
+		System.out.println("Current average spam probability: " + avgProbabilityToSeeSpamMessage);
 		
 		return probability;
 	}
@@ -67,7 +98,6 @@ public class SpamFilter {
 		for(int i=0; i<8; i++){
 			countArr[i] += features[i];
 		}
-		
 		return java.util.Arrays.toString(countArr);
 	}
 	
@@ -87,7 +117,6 @@ public class SpamFilter {
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	
@@ -117,7 +146,6 @@ public class SpamFilter {
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	

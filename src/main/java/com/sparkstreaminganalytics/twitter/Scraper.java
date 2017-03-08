@@ -42,6 +42,11 @@ public class Scraper {
 	private static String tmpCountryCode = "";
 	private static String tmpCountryName = "";
 	private static String elasticDateFormat = "yyyyMMdd'T'HHmmssZ";
+	private static int nonEnglishTweets;
+	private static int englishTweets;
+	private static boolean statusIsSpam;
+	private static int totalStatusesPassedEnSpamFilter;
+	private static int sensibleLocations;
 
 	private static Locale[] getLocaleObjects(){
 		String[] localeStrings = Locale.getISOCountries();
@@ -51,23 +56,6 @@ public class Scraper {
 			localesObj[i] = new Locale("", localeStrings[i]);
 		}
 		return localesObj;
-	}
-	
-	// Clean the tweet data to enhance the efficiency of the sentiment analysis.
-	private static String getCleanedTextTweet(String originalTweet){
-		String cleanTweet = originalTweet.replaceAll("\n", "")
-				  // Remove Retweets
-			      .replaceAll("RT\\s+", "")
-			      // Remove Mentions which follow a word
-			      .replaceAll("\\s+@\\w+", "")
-			      // Remove Mentions at the begining
-			      .replaceAll("@\\w+", "")
-			      // Remove URL
-			      .replaceAll("((www\\.[^\\s]+)|(https?://[^\\s]+))", "")
-			      // Remove other useless symbols, inlcuding the # from the hashtag
-				  .replaceAll("[*#@<>]", "");
-		
-		return cleanTweet;
 	}
 	
 	// Gson API is a Google API used for conversion Java and JSON objects.
@@ -122,14 +110,30 @@ public class Scraper {
 		JavaDStream<Status> englishStatuses = stream.filter(new Function<Status, Boolean>() {
 			@Override
 			public Boolean call(Status status) {
-				if(SpamFilter.isSpam(status)){
-					System.out.println("SPAM##################################################################");
+				// Collect statistics, before filtering.
+				if (!status.getLang().equals("en")){
+					nonEnglishTweets++;
 				}
-				return status.getLang().equals("en") && !(SpamFilter.isSpam(status));
+				
+				statusIsSpam = SpamFilter.isSpam(status);
+				
+				System.out.println("\n************************************\n");
+				System.out.println("English filter statistics: ");
+				System.out.println("Filtered non-english Tweets:" + nonEnglishTweets);
+				
+				// Filter the non-english statuses.
+				if(!statusIsSpam){
+					totalStatusesPassedEnSpamFilter++;
+				}
+				
+				System.out.println("\n************************************\n");
+				System.out.println("Total messages passed the EN & SPAM filter: " + totalStatusesPassedEnSpamFilter);
+				System.out.println("####################################\n");
+				return status.getLang().equals("en") && !statusIsSpam;
 			}
 		});
+		 
 		
-		// 
 		JavaDStream<String> processedTweets = englishStatuses.flatMap(new FlatMapFunction<Status, String>() {
 			// Handle this exception later on instead of throwing it.
 			@Override
@@ -153,7 +157,6 @@ public class Scraper {
 		            System.err.println("There was problem with parsing the date.");
 		        }
 				
-				
 				jsonObj.getJSONObject("user").remove("location");
 				
 				
@@ -171,22 +174,24 @@ public class Scraper {
 							|| tmpUserLocation.contains(tmpCountryName))
 						{
 							jsonObj.getJSONObject("user").put("location", countryObject.getDisplayCountry());
+							sensibleLocations++;
 						}
 					}
 				}
 				
-				// Add the sentiment to the Tweet JSON object
-				jsonObj.put("sentiment", NLP.findSentiment(getCleanedTextTweet(jsonObj.getString("text"))));
+				System.out.println("Statuses with sensible locations: " + sensibleLocations + " out of " + totalStatusesPassedEnSpamFilter);
 				
+				// Add the sentiment to the Tweet JSON object
+				jsonObj.put("sentiment", NLP.findUsefulSentiment(jsonObj.getString("text")));
+				System.out.println("Statuses with unknown sentiments: " + NLP.numberOfUnknowns);
 				return Arrays.asList(jsonObj.toString() + "\n").iterator();
 			}
 		});
 		
-		JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");    
-		//processedTweets.print();
+		//JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");    
+		processedTweets.print();
 
 		jssc.start();
-		
 		
 		try {
 			jssc.awaitTermination();
