@@ -3,8 +3,6 @@ package com.sparkstreaminganalytics.twitter;
 import java.util.HashMap;
 import java.util.Properties;
 
-
-
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -17,6 +15,8 @@ public class NLP {
 	static StanfordCoreNLP pipeline;
 	static Properties properties;
 	static HashMap<Integer, Integer[]> sentimentDifferenceMap = new HashMap<Integer, Integer[]>();
+	static int[] latestSentimentDifference = new int[2];
+	static int latestSentimentScore = -1;
 	
 	public static int numberOfUnknowns;
 	
@@ -57,11 +57,16 @@ public class NLP {
 	public static int findUsefulSentiment(String tweet){
 		int notCleanedTextSentiment = findSentiment(tweet);
 		int cleanedTextSentiment = findSentiment(getCleanedTextTweet(tweet));
+		
 		calculateSentimentDifference(cleanedTextSentiment, notCleanedTextSentiment);
+		
 		if(cleanedTextSentiment == notCleanedTextSentiment){
 			return cleanedTextSentiment;
 		}
 		else{
+			latestSentimentDifference[0] = notCleanedTextSentiment;
+			latestSentimentDifference[1] = cleanedTextSentiment;
+			latestSentimentScore = 5;
 			numberOfUnknowns++;
 			// Five(5) is the score for Unknown
 			return 5;

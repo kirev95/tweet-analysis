@@ -9,6 +9,10 @@ import org.joda.time.format.DateTimeFormatter;
 import twitter4j.Status;
 import twitter4j.User;
 
+/**
+*
+* @author Veselin Kirev
+*/
 public class SpamFilter {
 	private static int[] countArr = new int[8];
 	private static int numberOfStatusesChecked = 0;

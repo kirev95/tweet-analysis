@@ -47,6 +47,7 @@ public class Scraper {
 	private static boolean statusIsSpam;
 	private static int totalStatusesPassedEnSpamFilter;
 	private static int sensibleLocations;
+	private static int anomaliesDetected;
 
 	private static Locale[] getLocaleObjects(){
 		String[] localeStrings = Locale.getISOCountries();
@@ -179,7 +180,6 @@ public class Scraper {
 					}
 				}
 				
-				
 				// Add the sentiment to the Tweet JSON object
 				jsonObj.put("sentiment", NLP.scoreToString(NLP.findUsefulSentiment(jsonObj.getString("text"))));
 				
@@ -196,6 +196,30 @@ public class Scraper {
 					}
 				}
 				
+				// 5 is the Unknown score.
+				// Anomaly detection in the sentiment score.
+				if(NLP.latestSentimentScore == 5){
+					System.out.println("------ " + NLP.latestSentimentDifference[0] + " ---- " + NLP.latestSentimentDifference[1]);
+					if((NLP.latestSentimentDifference[0] == 0 && NLP.latestSentimentDifference[1] == 3)
+							|| (NLP.latestSentimentDifference[0] == 0 && NLP.latestSentimentDifference[1] == 4)
+							|| (NLP.latestSentimentDifference[0] == 1 && NLP.latestSentimentDifference[1] == 3)
+							|| (NLP.latestSentimentDifference[0] == 1 && NLP.latestSentimentDifference[1] == 4)
+							|| (NLP.latestSentimentDifference[0] == 3 && NLP.latestSentimentDifference[1] == 0)
+							|| (NLP.latestSentimentDifference[0] == 3 && NLP.latestSentimentDifference[1] == 1)
+							|| (NLP.latestSentimentDifference[0] == 4 && NLP.latestSentimentDifference[1] == 0)
+							|| (NLP.latestSentimentDifference[0] == 4 && NLP.latestSentimentDifference[1] == 1)){
+						
+						anomaliesDetected++;
+						
+						System.out.println("\n************************************\n");
+						System.out.println("Anomaly detected, possible cause: ");
+						System.out.println("Cleaned Mention: " + jsonObj.getJSONArray("userMentionEntities").toString());
+						System.out.println("Cleaned URL: " + jsonObj.getJSONArray("urlEntities").toString());
+					}
+				}
+				
+				System.out.println("\n************************************\n");
+				System.out.println("Total number of anomalies detected: " + anomaliesDetected);
 				System.out.println("####################################\n");
 				return Arrays.asList(jsonObj.toString() + "\n").iterator();
 			}
