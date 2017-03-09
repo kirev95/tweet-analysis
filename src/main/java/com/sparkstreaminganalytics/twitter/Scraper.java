@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -48,7 +49,8 @@ public class Scraper {
 	private static int totalStatusesPassedEnSpamFilter;
 	private static int sensibleLocations;
 	private static int anomaliesDetected;
-	private static HashSet<Long> retweetIds = new HashSet<Long>();
+	private static HashSet<Long> retweetIdsSet = new HashSet<Long>();
+	private static HashMap<Long, Long[]> uniqueRetweedIdToFavAndRetCountMap = new HashMap<Long, Long[]>();
 	private static long approximateTotalEngagement;
 
 	private static Locale[] getLocaleObjects() {
@@ -229,15 +231,52 @@ public class Scraper {
 						.getJSONArray("userMentionEntities").toString().contains(keywords[0])
 						|| jsonObj.getJSONArray("urlEntities").toString().contains(keywords[0]))) {
 
-					// 2 comes from the fact that the keyword is mentioned both
-					// in the tweet
-					// and in the retweet.
-					approximateTotalEngagement += 2 + jsonObj.getJSONObject("retweetedStatus").getInt("favoriteCount")
-							+ jsonObj.getJSONObject("retweetedStatus").getInt("retweetCount");
+					if (retweetIdsSet.add(jsonObj.getJSONObject("retweetedStatus").getLong("id"))) {
+
+						// Add it to the map where the update will hapen later
+						// on.
+						uniqueRetweedIdToFavAndRetCountMap.put(jsonObj.getJSONObject("retweetedStatus").getLong("id"),
+								new Long[2]);
+
+						uniqueRetweedIdToFavAndRetCountMap
+								.get(jsonObj.getJSONObject("retweetedStatus").getLong("id"))[0] = new Long(
+										jsonObj.getJSONObject("retweetedStatus").getInt("favoriteCount"));
+
+						uniqueRetweedIdToFavAndRetCountMap
+								.get(jsonObj.getJSONObject("retweetedStatus").getLong("id"))[1] = new Long(
+										jsonObj.getJSONObject("retweetedStatus").getInt("retweetCount"));
+
+						// 2 comes from the fact that the keyword is mentioned
+						// both in the tweet and in the retweet.
+						approximateTotalEngagement += 2
+								+ jsonObj.getJSONObject("retweetedStatus").getInt("favoriteCount")
+								+ jsonObj.getJSONObject("retweetedStatus").getInt("retweetCount");
+
+					} else {
+						// Add the to the engagement only the difference of retweet and favorite counts
+						// since last time. E.g. treat it as update, instead of just adding it.
+						approximateTotalEngagement += 2
+								+ jsonObj.getJSONObject("retweetedStatus").getInt("favoriteCount")
+								+ jsonObj.getJSONObject("retweetedStatus").getInt("retweetCount")
+								- uniqueRetweedIdToFavAndRetCountMap
+										.get(jsonObj.getJSONObject("retweetedStatus").getLong("id"))[0]
+								- uniqueRetweedIdToFavAndRetCountMap
+										.get(jsonObj.getJSONObject("retweetedStatus").getLong("id"))[1];
+						
+						// Then update the latest retweet and favorite counts information.
+						uniqueRetweedIdToFavAndRetCountMap
+								.get(jsonObj.getJSONObject("retweetedStatus").getLong("id"))[0] = new Long(
+										jsonObj.getJSONObject("retweetedStatus").getInt("favoriteCount"));
+
+						uniqueRetweedIdToFavAndRetCountMap
+								.get(jsonObj.getJSONObject("retweetedStatus").getLong("id"))[1] = new Long(
+										jsonObj.getJSONObject("retweetedStatus").getInt("retweetCount"));
+
+					}
 				} else {
 					approximateTotalEngagement++;
 				}
-				
+
 				System.out.println("\n************************************\n");
 				System.out.println("Approximate total engagement: " + approximateTotalEngagement);
 				System.out.println("####################################\n");
