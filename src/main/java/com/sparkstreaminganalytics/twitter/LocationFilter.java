@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import twitter4j.Status;
 
-public class LocationFilter {
+abstract public class LocationFilter {
 	private static Locale[] locales = getLocaleObjects();
 	private static String tmpUserLocation = "";
 	private static String tmpCountryCode = "";
@@ -26,7 +26,6 @@ public class LocationFilter {
 				tmpUserLocation.replaceAll("\\b" + "UK" + "\\b", "GB");
 				tmpCountryCode = countryObject.getCountry();
 				tmpCountryName = countryObject.getDisplayCountry();
-				System.out.println("Original location: " + tmpUserLocation);
 				if (tmpUserLocation.contains(tmpCountryCode) || tmpUserLocation.contains(tmpCountryName)) {
 					jsonObj.getJSONObject("user").put("location", countryObject.getDisplayCountry());
 					sensibleLocations++;

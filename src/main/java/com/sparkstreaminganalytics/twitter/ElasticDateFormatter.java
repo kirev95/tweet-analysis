@@ -6,7 +6,7 @@ import java.util.TimeZone;
 
 import org.json.JSONObject;
 
-public class ElasticDateFormatter {
+abstract public class ElasticDateFormatter {
 	private static String dateFieldName = "createdAt";
 	private static String dateOriginalFormat = "MMM dd, yyyy h:mm:ss a";
 	private static String dateRequiredFormat = "yyyyMMdd'T'HHmmssZ";

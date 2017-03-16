@@ -13,7 +13,7 @@ import twitter4j.User;
 *
 * @author Veselin Kirev
 */
-public class SpamFilter {
+abstract public class SpamFilter {
 	private static int[] countArr = new int[8];
 	private static int numberOfStatusesChecked = 0;
 	private static int identifiedSpam = 0;

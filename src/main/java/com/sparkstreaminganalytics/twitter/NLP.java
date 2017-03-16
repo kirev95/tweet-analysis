@@ -1,6 +1,6 @@
 package com.sparkstreaminganalytics.twitter;
 
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.Properties;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -11,12 +11,9 @@ import edu.stanford.nlp.sentiment.SentimentCoreAnnotations.SentimentAnnotatedTre
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 
-public class NLP {
+abstract public class NLP {
 	static StanfordCoreNLP pipeline;
 	static Properties properties;
-	static HashMap<Integer, Integer[]> sentimentDifferenceMap = new HashMap<Integer, Integer[]>();
-	static int[] latestSentimentDifference = new int[2];
-	static int latestSentimentScore = -1;
 	
 	public static int numberOfUnknowns;
 	
@@ -27,49 +24,13 @@ public class NLP {
 		pipeline = new StanfordCoreNLP(properties);
 		
 		for(int i=0; i<5; i++){
-			sentimentDifferenceMap.put(i, new Integer[5]);
+			SentimentAnomalyDetector.sentimentDifferenceMap.put(i, new Integer[5]);
 		}
 		
 		for(int notClTweetSentScoreIndex=0; notClTweetSentScoreIndex<5; notClTweetSentScoreIndex++){
 			for(int clTweetSentScoreIndex=0; clTweetSentScoreIndex<5; clTweetSentScoreIndex++){
-				sentimentDifferenceMap.get(notClTweetSentScoreIndex)[clTweetSentScoreIndex] = new Integer(0);
+				SentimentAnomalyDetector.sentimentDifferenceMap.get(notClTweetSentScoreIndex)[clTweetSentScoreIndex] = new Integer(0);
 			}
-		}
-	}
-	
-	// Clean the tweet data to enhance the efficiency of the sentiment analysis.
-	private static String getCleanedTextTweet(String originalTweet){
-		String cleanTweet = originalTweet.replaceAll("\n", "")
-				  // Remove Retweets
-			      .replaceAll("RT\\s+", "")
-			      // Remove Mentions which follow a word
-			      .replaceAll("\\s+@\\w+", "")
-			      // Remove Mentions at the begining
-			      .replaceAll("@\\w+", "")
-			      // Remove URL
-			      .replaceAll("((www\\.[^\\s]+)|(https?://[^\\s]+))", "")
-			      // Remove other useless symbols, inlcuding the # from the hashtag
-				  .replaceAll("[*#@<>]", "");
-		
-		return cleanTweet;
-	}
-
-	public static int findUsefulSentiment(String tweet){
-		int notCleanedTextSentiment = findSentiment(tweet);
-		int cleanedTextSentiment = findSentiment(getCleanedTextTweet(tweet));
-		
-		calculateSentimentDifference(cleanedTextSentiment, notCleanedTextSentiment);
-		
-		if(cleanedTextSentiment == notCleanedTextSentiment){
-			return cleanedTextSentiment;
-		}
-		else{
-			latestSentimentDifference[0] = notCleanedTextSentiment;
-			latestSentimentDifference[1] = cleanedTextSentiment;
-			latestSentimentScore = 5;
-			numberOfUnknowns++;
-			// Five(5) is the score for Unknown
-			return 5;
 		}
 	}
 	
@@ -100,8 +61,9 @@ public class NLP {
 		return mainSentiment;
 	}
 	
+	//Obtain a human readable form of the sentiment score.
 	public static String scoreToString(int sentimentScore){
-		//Obtain a human readable form of the sentiment score.
+		
 		switch (sentimentScore) {
         case 0:
             return "Very Negative";
@@ -118,11 +80,5 @@ public class NLP {
         default:
             return "";
         }
-	}
-	
-	public static void calculateSentimentDifference(int cleanedTextSentiment, int notCleanedTextSentiment){
-		if(sentimentDifferenceMap.containsKey(notCleanedTextSentiment)){
-			sentimentDifferenceMap.get(notCleanedTextSentiment)[cleanedTextSentiment]++;
-		}
 	}
 }
