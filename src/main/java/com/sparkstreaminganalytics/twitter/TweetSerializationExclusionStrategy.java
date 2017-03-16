@@ -5,7 +5,7 @@ import com.google.gson.FieldAttributes;
 
 import twitter4j.Status;
 
-public class TestExclStrat implements ExclusionStrategy {
+public class TweetSerializationExclusionStrategy implements ExclusionStrategy {
 	
 	// Do not skip classes.
     public boolean shouldSkipClass(Class<?> arg0) {

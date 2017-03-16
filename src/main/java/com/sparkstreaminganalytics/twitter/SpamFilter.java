@@ -64,18 +64,18 @@ public class SpamFilter {
 			isCurrentStatusSpam = true;
 		}
 		
-		// Calculate average the average probability to see a SPAM message.
-		if(identifiedSpam >= 1 && numberOfStatusesChecked > 1){
-			probabilityToSeeSpamMessage = identifiedSpam / (double) numberOfStatusesChecked;
-			avgProbabilityToSeeSpamMessage = ((avgProbabilityToSeeSpamMessage*(double)(numberOfStatusesChecked-1)) + probability) / (double) numberOfStatusesChecked;
-			
-		}
-		else if(identifiedSpam == 0 && numberOfStatusesChecked >= 1){
-			avgProbabilityToSeeSpamMessage = 0;
-		}
-		else{
-			avgProbabilityToSeeSpamMessage = 1;
-		}
+//		// Calculate average the average probability to see a SPAM message.
+//		if(identifiedSpam >= 1 && numberOfStatusesChecked > 1){
+//			probabilityToSeeSpamMessage = identifiedSpam / (double) numberOfStatusesChecked;
+//			avgProbabilityToSeeSpamMessage = ((avgProbabilityToSeeSpamMessage*(double)(numberOfStatusesChecked-1)) + probabilityToSeeSpamMessage) / (double) numberOfStatusesChecked;
+//			
+//		}
+//		else if(identifiedSpam == 0 && numberOfStatusesChecked >= 1){
+//			avgProbabilityToSeeSpamMessage = 0;
+//		}
+//		else{
+//			avgProbabilityToSeeSpamMessage = 1;
+//		}
 		
 		// Print the statistics.
 		System.out.println("This tweet spam statistics:");
@@ -93,7 +93,7 @@ public class SpamFilter {
 		
 		System.out.println("Statuses checked: " + numberOfStatusesChecked);
 		System.out.println("Total messages identified as SPAM so far: " + identifiedSpam);
-		System.out.println("Current average spam probability: " + avgProbabilityToSeeSpamMessage);
+//		System.out.println("Current average spam probability: " + avgProbabilityToSeeSpamMessage);
 		
 		return probability;
 	}
