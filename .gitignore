@@ -1,2 +1,5 @@
 *.class
+*.lst
+*.jar
 node_modules
+
