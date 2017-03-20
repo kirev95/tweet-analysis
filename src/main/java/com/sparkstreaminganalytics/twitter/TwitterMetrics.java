@@ -3,6 +3,8 @@ package com.sparkstreaminganalytics.twitter;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 import org.json.JSONObject;
 
 import twitter4j.Status;
@@ -11,6 +13,8 @@ abstract public class TwitterMetrics {
 	private static HashSet<Long> retweetIdsSet = new HashSet<Long>();
 	private static HashMap<Long, Long[]> uniqueRetweedIdToFavAndRetCountMap = new HashMap<Long, Long[]>();
 	private static long approximateTotalEngagement;
+	private static boolean isFirstRTWithThisID = false;
+	private static double averageRetweetResponseTime = 0;
 	
 	public static void updateApproximateTotalEngagement(Status status, JSONObject TweetStatusJsonObject, String keyword){
 		if ((status.getRetweetedStatus() != null) && (TweetStatusJsonObject.getJSONObject("retweetedStatus")
@@ -18,7 +22,10 @@ abstract public class TwitterMetrics {
 				|| TweetStatusJsonObject.getJSONArray("urlEntities").toString().contains(keyword))) {
 
 			if (retweetIdsSet.add(TweetStatusJsonObject.getJSONObject("retweetedStatus").getLong("id"))) {
-
+				
+				// Mark the retweet as the first one received with this ID.
+				isFirstRTWithThisID = true;
+				
 				// Add it to the map where the update will happen later on.
 				uniqueRetweedIdToFavAndRetCountMap.put(TweetStatusJsonObject.getJSONObject("retweetedStatus").getLong("id"),
 						new Long[2]);
@@ -65,5 +72,30 @@ abstract public class TwitterMetrics {
 	
 	public static long getApproximateTotalEngagement(){
 		return approximateTotalEngagement;
+	}
+	
+	public static double getAverageRTResponseTime(Status status){
+		if(isFirstRTWithThisID && isCurrentTweetTheFirstToRetweet(status)){
+			DateTime tweetTime = new DateTime(status.getCreatedAt());
+			DateTime rtTime = new DateTime(status.getRetweetedStatus().getCreatedAt());
+			int secondsBetween = Seconds.secondsBetween(rtTime, tweetTime).getSeconds();
+			
+			if(averageRetweetResponseTime == 0){
+				averageRetweetResponseTime = secondsBetween;
+			}
+			else{
+				averageRetweetResponseTime = (averageRetweetResponseTime * retweetIdsSet.size() + secondsBetween) / (double) (retweetIdsSet.size() + 1);
+			}
+		}
+		
+		return averageRetweetResponseTime;
+	}
+	
+	public static void resetRTValidator(){
+		isFirstRTWithThisID = false;
+	}
+	
+	private static boolean isCurrentTweetTheFirstToRetweet(Status status){
+		return (status.getRetweetedStatus().getRetweetCount() < 2);
 	}
 }

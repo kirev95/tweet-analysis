@@ -132,7 +132,13 @@ public class TweetsAnalysisPipeline {
 				
 				System.out.println("\n************************************\n");
 				System.out.println("Approximate total engagement: " + TwitterMetrics.getApproximateTotalEngagement());
+				
+				System.out.println("\n************************************\n");
+				System.out.println("ARRT: " + TwitterMetrics.getAverageRTResponseTime(status));
+				
 				System.out.println("####################################\n");
+				
+				TwitterMetrics.resetRTValidator();
 				return Arrays.asList(TweetStatusJsonObject.toString() + "\n").iterator();
 			}
 		});
