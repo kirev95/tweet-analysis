@@ -13,7 +13,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.streaming.api.java.JavaDStream;
-
+import org.elasticsearch.spark.streaming.api.java.JavaEsSparkStreaming;
 // Rich JSON manipulation library.
 import org.json.JSONObject;
 
@@ -130,21 +130,27 @@ public class TweetsAnalysisPipeline {
 				// Update approximate total engagement accumulated so far.
 				TwitterMetrics.updateApproximateTotalEngagement(status, TweetStatusJsonObject, keywords[0]);
 				
+				
+				// Put the new fields into the JSON Tweet object to be put into Elasticsearch
+				TweetStatusJsonObject.put("approximateTotalEngagement", TwitterMetrics.getApproximateTotalEngagement());
+				TweetStatusJsonObject.put("approximateRetweetResponseTime", TwitterMetrics.getAverageRTResponseTime(status));
+				
 				System.out.println("\n************************************\n");
 				System.out.println("Approximate total engagement: " + TwitterMetrics.getApproximateTotalEngagement());
 				
 				System.out.println("\n************************************\n");
-				System.out.println("ARRT: " + TwitterMetrics.getAverageRTResponseTime(status));
+				System.out.println("Approximate RT Response Time: " + TwitterMetrics.getAverageRTResponseTime(status));
 				
 				System.out.println("####################################\n");
+				
 				
 				TwitterMetrics.resetRTValidator();
 				return Arrays.asList(TweetStatusJsonObject.toString() + "\n").iterator();
 			}
 		});
 
-		//JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");
-		processedTweets.print();
+		JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");
+		//processedTweets.print();
 
 		tweetsReceiver.getJavaStreamingContext().start();
 
