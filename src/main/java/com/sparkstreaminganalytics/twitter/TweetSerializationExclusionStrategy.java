@@ -31,6 +31,34 @@ public class TweetSerializationExclusionStrategy implements ExclusionStrategy {
 	        case "currentUserRetweetId":  return true;
 	        case "quotedStatus":  return true;
 	        case "quotedStatusId":  return true;
+	        case "displayTextRangeStart": return true;
+	        case "isGeoEnabled": return true;
+	        case "showAllInlineMedia": return true;
+	        case "isVerified": return true;
+	        case "translator": return true;
+	        case "profileTextColor": return true;
+	        case "descriptionURLEntities": return true;
+	        case "screenName": return true;
+	        case "profileUseBackgroundImage": return true;
+	        case "profileBackgroundTiled": return true;
+	        case "profileBackgroundImageUrl": return true;
+	        case "isProtected": return true;
+	        case "isFollowRequestSent": return true;
+	        case "isContributorsEnabled": return true;
+	        case "isDefaultProfile": return true;
+	        case "profileImageUrl": return true;
+	        case "profileSidebarBorderColor": return true;
+	        case "utcOffset": return true;
+	        case "profileBackgroundImageUrlHttps": return true;
+	        case "profileBackgroundColor": return true;
+	        case "timeZone": return true;
+	        case "profileLinkColor": return true;
+	        case "profileBannerImageUrl": return true;
+	        case "listedCount": return true;
+	        case "profileSidebarFillColor": return true;
+	        case "name": return true;
+	        case "profileImageUrlHttps": return true;
+	        case "url": return true;
 	        default: return false;
     	}
     }
