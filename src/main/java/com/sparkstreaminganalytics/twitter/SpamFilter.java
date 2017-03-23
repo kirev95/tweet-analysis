@@ -14,13 +14,11 @@ import twitter4j.User;
 * @author Veselin Kirev
 */
 abstract public class SpamFilter {
-	private static int[] countArr = new int[8];
+	private static int[] countArr = new int[9];
 	private static int numberOfStatusesChecked = 0;
 	private static int identifiedSpam = 0;
 	private static boolean isCurrentStatusSpam = false;
 	private static final double threshold = 0.5;
-	private static double avgProbabilityToSeeSpamMessage = 0;
-	private static double probabilityToSeeSpamMessage = 0;
 	
 	// Returns true if the status is spam.
 	public static boolean isSpam(Status status){
@@ -41,55 +39,52 @@ abstract public class SpamFilter {
 		int isCreatingLittleContent = isCreatingLittleContent(status.getUser()) ? 1 : 0;
 		int hasAFewFollowers = hasAFewFollowers(status.getUser()) ? 1 : 0;
 		int hasShortDescription = hasShortDescription(status.getUser()) ? 1 : 0;
-		int containsBotFriendlyContentSources = containsBotFriendlyContentSources(status) ? 1 : 0;
+		int hasDefaultPicture = hasDefaultProfileImage(status.getUser()) ? 1 : 0;
 		int hasManyHashtags = hasManyHashtags(status) ? 1 : 0;
 		int hasShortContentLength = hasShortContentLength(status) ? 1 : 0;
 		int requestsRetweetOrFollow = requestsRetweetOrFollow(status) ? 1 : 0;
+		int containsBotFriendlyContentSources = containsBotFriendlyContentSources(status) ? 1 : 0;
 		
 		int numberOfFeatures = 8;
 		
-		double probability = (isRecentlyCreated + isCreatingLittleContent + hasAFewFollowers + hasShortDescription
-				+ containsBotFriendlyContentSources + hasManyHashtags + hasShortContentLength
-				+ requestsRetweetOrFollow) / (double)numberOfFeatures;
+		double probability = 0;
 		
-		// In this way: 2 features = 0.5
-		// 3 features = 0.61 etc...
-		// So 2 features are enough to say that it is a spam.
-		if(probability != 0){
-			probability = Math.sqrt(1 / probability) * probability;
-		}
-		
-		if(probability >= threshold){
+		if(containsBotFriendlyContentSources(status)){
+			probability = 1;
 			identifiedSpam++;
 			isCurrentStatusSpam = true;
 		}
-		
-//		// Calculate average the average probability to see a SPAM message.
-//		if(identifiedSpam >= 1 && numberOfStatusesChecked > 1){
-//			probabilityToSeeSpamMessage = identifiedSpam / (double) numberOfStatusesChecked;
-//			avgProbabilityToSeeSpamMessage = ((avgProbabilityToSeeSpamMessage*(double)(numberOfStatusesChecked-1)) + probabilityToSeeSpamMessage) / (double) numberOfStatusesChecked;
-//			
-//		}
-//		else if(identifiedSpam == 0 && numberOfStatusesChecked >= 1){
-//			avgProbabilityToSeeSpamMessage = 0;
-//		}
-//		else{
-//			avgProbabilityToSeeSpamMessage = 1;
-//		}
+		else{
+			probability = (isRecentlyCreated + isCreatingLittleContent + hasAFewFollowers + hasShortDescription
+					+ hasDefaultPicture + hasManyHashtags + hasShortContentLength
+					+ requestsRetweetOrFollow) / (double)numberOfFeatures;
+			
+			// In this way: 2 features = 0.5
+			// 3 features = 0.61 etc...
+			// So 2 features are enough to say that it is a spam.
+			if(probability != 0){
+				probability = Math.sqrt(1 / probability) * probability;
+			}
+			
+			if(probability >= threshold){
+				identifiedSpam++;
+				isCurrentStatusSpam = true;
+			}
+		}
 		
 		// Print the statistics.
 		System.out.println("This tweet spam statistics:");
 		System.out.println("Is this status a spam?: " + (isCurrentStatusSpam ? "Yes" : "No"));
 		
-		System.out.format("%16s%16s%17s%19s%13s%15s%15s%20s \n", "Recently created", "Little content", "A few followers", "Short description", "Bot sources", "Many hashtags", "Short content", "Reqeusts RT/follow");
-		System.out.format("%16d%16d%17d%19d%13d%15d%15d%20d \n", isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
-				, containsBotFriendlyContentSources , hasManyHashtags , hasShortContentLength
-				, requestsRetweetOrFollow);
+		System.out.format("%16s%16s%17s%19s%13s%15s%15s%20s%13s \n", "Recently created", "Little content", "A few followers", "Short description", "Default Img", "Many hashtags", "Short content", "Reqeusts RT/follow", "Bot sources");
+		System.out.format("%16d%16d%17d%19d%13s%15d%15d%20d%13d \n", isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
+				, hasDefaultPicture , hasManyHashtags , hasShortContentLength
+				, requestsRetweetOrFollow, containsBotFriendlyContentSources);
 		System.out.println("\n************************************\n");
 		System.out.println("All tweets spam statistics:");
 		System.out.println("\nFeatures counter: " + evaluateFeatures(isRecentlyCreated , isCreatingLittleContent , hasAFewFollowers , hasShortDescription
-				, containsBotFriendlyContentSources , hasManyHashtags , hasShortContentLength
-				, requestsRetweetOrFollow));
+				, hasDefaultPicture , hasManyHashtags , hasShortContentLength
+				, requestsRetweetOrFollow, containsBotFriendlyContentSources));
 		
 		System.out.println("Statuses checked: " + numberOfStatusesChecked);
 		System.out.println("Total messages identified as SPAM so far: " + identifiedSpam);
@@ -99,7 +94,7 @@ abstract public class SpamFilter {
 	}
 	
 	private static String evaluateFeatures(int ... features){	
-		for(int i=0; i<8; i++){
+		for(int i=0; i<9; i++){
 			countArr[i] += features[i];
 		}
 		return java.util.Arrays.toString(countArr);
@@ -142,7 +137,7 @@ abstract public class SpamFilter {
 		String source = status.getSource().toLowerCase();
 		
 		// Common request phrases in the tweets.
-		String[] botSources = new String[]{"twittbot", "easybotter", "hellotxt", "dlvr.it", "hootsuite", "buffer"};
+		String[] botSources = new String[]{"bot", "tilde.town", "hubot", "huginn", "botomatic", "twittbot", "easybotter", "hellotxt", "dlvr.it", "hootsuite", "buffer"};
 		
 		// Return true if any of the request is found in the text.
 		for(String botSource : botSources){
@@ -177,5 +172,12 @@ abstract public class SpamFilter {
 		DateTime userAccountStartDate = new DateTime(user.getCreatedAt());
 		int days = Days.daysBetween(userAccountStartDate, now).getDays();
 		return days <= 1;
+	}
+	
+	// Feature 9: Egg pictures are the default ones given by Twitter to the new users.
+	// Spammers/Bots usually have these, as e.g. a Bot creates a new default account
+	// and starts spamming.
+	private static boolean hasDefaultProfileImage(User user){
+		return user.isDefaultProfileImage();
 	}
 }

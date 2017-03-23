@@ -103,7 +103,10 @@ public class TweetsAnalysisPipeline {
 				
 				// Add the sentiment to the Tweet JSON object
 				TweetStatusJsonObject.put("sentiment", NLP.scoreToString(SentimentAnomalyDetector.getSentimentWithoutAnomalies(TweetStatusJsonObject.getString("text"))));
-
+				
+				// Update the number of detected anomalies result of contraversial sentiments.
+				SentimentAnomalyDetector.updateAnomaliesCount(TweetStatusJsonObject);
+				
 				// Printing stats about locations and number of unknown sentiments.
 				System.out.println("Statuses with sensible locations: " + LocationFilter.sensibleLocations + " out of "
 						+ totalStatusesPassedEnSpamFilter);
@@ -119,9 +122,6 @@ public class TweetsAnalysisPipeline {
 						}
 					}
 				}
-				
-				// Update the number of detected anomalies result of contraversial sentiments.
-				SentimentAnomalyDetector.updateAnomaliesCount(TweetStatusJsonObject);
 				
 				// Print the total anomalies stats.
 				System.out.println("\n************************************\n");
@@ -143,14 +143,13 @@ public class TweetsAnalysisPipeline {
 				
 				System.out.println("####################################\n");
 				
-				
 				TwitterMetrics.resetRTValidator();
 				return Arrays.asList(TweetStatusJsonObject.toString() + "\n").iterator();
 			}
 		});
 
-		JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");
-		//processedTweets.print();
+		//JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");
+		processedTweets.print();
 
 		tweetsReceiver.getJavaStreamingContext().start();
 
@@ -160,6 +159,7 @@ public class TweetsAnalysisPipeline {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	// Function to clean the existing Elasticsearch index, in order to be able to start
 	// a clean real-time analysis session.
@@ -179,5 +179,33 @@ public class TweetsAnalysisPipeline {
 			e.printStackTrace();
 			System.exit(0);
 		}
+	}
+	
+	private static void removeUselessUserFields(JSONObject TweetStatusJsonObject){
+		TweetStatusJsonObject.getJSONObject("user").remove("showAllInlineMedia");
+		TweetStatusJsonObject.getJSONObject("user").remove("isVerified");
+		TweetStatusJsonObject.getJSONObject("user").remove("translator");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileTextColor");
+		TweetStatusJsonObject.getJSONObject("user").remove("descriptionURLEntities");
+		TweetStatusJsonObject.getJSONObject("user").remove("screenName");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileUseBackgroundImage");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundTiled");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundImageUrl");
+		TweetStatusJsonObject.getJSONObject("user").remove("isProtected");
+		TweetStatusJsonObject.getJSONObject("user").remove("isFollowRequestSent");
+		TweetStatusJsonObject.getJSONObject("user").remove("isContributorsEnabled");
+		TweetStatusJsonObject.getJSONObject("user").remove("isDefaultProfile");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileImageUrl");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileSidebarBorderColor");
+		TweetStatusJsonObject.getJSONObject("user").remove("utcOffset");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundImageUrlHttps");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundColor");
+		TweetStatusJsonObject.getJSONObject("user").remove("timeZone");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileLinkColor");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileBannerImageUrl");
+		TweetStatusJsonObject.getJSONObject("user").remove("listedCount");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileSidebarFillColor");
+		TweetStatusJsonObject.getJSONObject("user").remove("profileImageUrlHttps");
+		TweetStatusJsonObject.getJSONObject("user").remove("name");
 	}
 }

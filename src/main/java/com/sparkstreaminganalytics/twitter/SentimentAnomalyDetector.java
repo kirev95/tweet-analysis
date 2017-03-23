@@ -11,13 +11,15 @@ abstract public class SentimentAnomalyDetector {
 	static int anomaliesDetected = 0;
 	
 	// Clean the tweet data to enhance the efficiency of the sentiment analysis.
-	private static String getCleanedTextTweet(String originalTweet){
+	protected static String getCleanedTextTweet(String originalTweet){
 		String cleanTweet = originalTweet.replaceAll("\n", "")
 				  // Remove Retweets
 			      .replaceAll("RT\\s+", "")
 			      // Remove Mentions which follow a word
 			      .replaceAll("\\s+@\\w+", "")
-			      // Remove Mentions at the begining
+			      // Remove Mentions at the begining with :
+			      .replaceAll("@\\w+:", "")
+			      // Remove Mentions at the begining without :
 			      .replaceAll("@\\w+", "")
 			      // Remove URL
 			      .replaceAll("((www\\.[^\\s]+)|(https?://[^\\s]+))", "")
@@ -65,8 +67,8 @@ abstract public class SentimentAnomalyDetector {
 				
 				System.out.println("\n************************************\n");
 				System.out.println("Anomaly detected, possible cause: ");
-				System.out
-						.println("Cleaned Mention: " + jsonObj.getJSONArray("userMentionEntities").toString());
+				System.out.println(latestSentimentDifference[0] + " and " + latestSentimentDifference[1]);
+				System.out.println("Cleaned Mention: " + jsonObj.getJSONArray("userMentionEntities").toString());
 				System.out.println("Cleaned URL: " + jsonObj.getJSONArray("urlEntities").toString());
 			}
 		}

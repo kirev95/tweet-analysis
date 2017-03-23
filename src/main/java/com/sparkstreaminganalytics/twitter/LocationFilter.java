@@ -23,7 +23,7 @@ abstract public class LocationFilter {
 		if (status.getUser().getLocation() != null) {
 			for (Locale countryObject : locales) {
 				tmpUserLocation = status.getUser().getLocation();
-				tmpUserLocation.replaceAll("\\b" + "UK" + "\\b", "GB");
+				tmpUserLocation = tmpUserLocation.replaceAll("\\b" + "UK" + "\\b", "GB");
 				tmpCountryCode = countryObject.getCountry();
 				tmpCountryName = countryObject.getDisplayCountry();
 				if (tmpUserLocation.contains(tmpCountryCode) || tmpUserLocation.contains(tmpCountryName)) {

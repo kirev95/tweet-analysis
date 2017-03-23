@@ -20,6 +20,9 @@ public class TweetStreamSparkReceiver {
 		this.master = reqMaster;
 		// Spark configuration
 		SparkConf conf = new SparkConf().setAppName(this.appName).setMaster(this.master);
+		// This below creates index automatically, but makes mistakes of the types
+		// and hence often leads to a lot of errors. So manual creation of the ES index is required
+		// when using the app for the first time. The latest used template is in the project folder.
 		// conf.set("es.index.auto.create", "true");
 		JavaSparkContext jsc = new JavaSparkContext(conf);
 		// Configure log level here. For debugging comment out this code.
