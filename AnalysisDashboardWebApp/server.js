@@ -43,7 +43,9 @@ app.get('/start_spark', function (req, res) {
 
        // Full-path for now - change it later to relative.
        console.log(req.query.keyword);
-       var cmd = 'java -cp /home/kirev/git/tweet-analysis/target/twitter-0.0.1-SNAPSHOT.jar com.sparkstreaminganalytics.twitter.TweetsAnalysisPipeline ' + req.query.keyword;
+       
+       // var cmd = 'java -cp /home/kirev/git/tweet-analysis/target/twitter-0.0.1-SNAPSHOT.jar com.sparkstreaminganalytics.twitter.TweetsAnalysisPipeline ' + req.query.keyword;
+       var cmd = 'java -cp ../target/twitter-0.0.1-SNAPSHOT.jar com.sparkstreaminganalytics.twitter.TweetsAnalysisPipeline ' + req.query.keyword;
 
        sparkChild = spawn(cmd, [], {shell: true});
 
