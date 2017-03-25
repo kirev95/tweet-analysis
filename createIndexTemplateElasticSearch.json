@@ -1,0 +1,857 @@
+PUT tweets
+{
+  "mappings": {
+    "tweetStatus": {
+      "properties": {
+        "createdAt": {
+          "type":   "date",
+          "format": "yyyyMMdd'T'HHmmssZ"
+        },
+        "sentiment":{
+        	"type": "text"
+        },
+	"approximateTotalEngagement":{
+		"type": "long"
+	},
+	"approximateRetweetResponseTime":{
+		"type": "integer"
+	},
+        "favoriteCount": {
+            "type": "long"
+          },
+          "hashtagEntities": {
+            "properties": {
+              "end": {
+                "type": "long"
+              },
+              "start": {
+                "type": "long"
+              },
+              "text": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "long"
+          },
+          "inReplyToScreenName": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "place": {
+            "properties": {
+              "boundingBoxCoordinates": {
+                "properties": {
+                  "latitude": {
+                    "type": "float"
+                  },
+                  "longitude": {
+                    "type": "float"
+                  }
+                }
+              },
+              "boundingBoxType": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "country": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "countryCode": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "fullName": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "id": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "placeType": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "url": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          "retweetCount": {
+            "type": "long"
+          },
+          "retweetedStatus": {
+            "properties": {
+              "createdAt": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "favoriteCount": {
+                "type": "long"
+              },
+              "hashtagEntities": {
+                "properties": {
+                  "end": {
+                    "type": "long"
+                  },
+                  "start": {
+                    "type": "long"
+                  },
+                  "text": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  }
+                }
+              },
+              "id": {
+                "type": "long"
+              },
+              "inReplyToScreenName": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "place": {
+                "properties": {
+                  "boundingBoxCoordinates": {
+                    "properties": {
+                      "latitude": {
+                        "type": "float"
+                      },
+                      "longitude": {
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "boundingBoxType": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "country": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "countryCode": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "fullName": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "id": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "name": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "placeType": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "url": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  }
+                }
+              },
+              "retweetCount": {
+                "type": "long"
+              },
+              "text": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "urlEntities": {
+                "properties": {
+                  "displayURL": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "end": {
+                    "type": "long"
+                  },
+                  "expandedURL": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "start": {
+                    "type": "long"
+                  },
+                  "url": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  }
+                }
+              },
+              "user": {
+                "properties": {
+                  "createdAt": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "description": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "favouritesCount": {
+                    "type": "long"
+                  },
+                  "followersCount": {
+                    "type": "long"
+                  },
+                  "friendsCount": {
+                    "type": "long"
+                  },
+                  "id": {
+                    "type": "long"
+                  },
+                  "isContributorsEnabled": {
+                    "type": "boolean"
+                  },
+                  "isDefaultProfile": {
+                    "type": "boolean"
+                  },
+                  "isDefaultProfileImage": {
+                    "type": "boolean"
+                  },
+                  "isFollowRequestSent": {
+                    "type": "boolean"
+                  },
+                  "isGeoEnabled": {
+                    "type": "boolean"
+                  },
+                  "isProtected": {
+                    "type": "boolean"
+                  },
+                  "isVerified": {
+                    "type": "boolean"
+                  },
+                  "listedCount": {
+                    "type": "long"
+                  },
+                  "location": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "name": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileBackgroundColor": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileBackgroundImageUrl": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileBackgroundImageUrlHttps": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileBackgroundTiled": {
+                    "type": "boolean"
+                  },
+                  "profileBannerImageUrl": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileImageUrl": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileImageUrlHttps": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileLinkColor": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileSidebarBorderColor": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileSidebarFillColor": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileTextColor": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "profileUseBackgroundImage": {
+                    "type": "boolean"
+                  },
+                  "screenName": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "showAllInlineMedia": {
+                    "type": "boolean"
+                  },
+                  "statusesCount": {
+                    "type": "long"
+                  },
+                  "timeZone": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "translator": {
+                    "type": "boolean"
+                  },
+                  "url": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "utcOffset": {
+                    "type": "long"
+                  }
+                }
+              },
+              "userMentionEntities": {
+                "properties": {
+                  "end": {
+                    "type": "long"
+                  },
+                  "id": {
+                    "type": "long"
+                  },
+                  "name": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "screenName": {
+                    "type": "text",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
+                  },
+                  "start": {
+                    "type": "long"
+                  }
+                }
+              }
+            }
+          },
+          "text": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "urlEntities": {
+            "properties": {
+              "displayURL": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "end": {
+                "type": "long"
+              },
+              "expandedURL": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "start": {
+                "type": "long"
+              },
+              "url": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          "user": {
+            "properties": {
+              "createdAt": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "description": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "favouritesCount": {
+                "type": "long"
+              },
+              "followersCount": {
+                "type": "long"
+              },
+              "friendsCount": {
+                "type": "long"
+              },
+              "id": {
+                "type": "long"
+              },
+              "isContributorsEnabled": {
+                "type": "boolean"
+              },
+              "isDefaultProfile": {
+                "type": "boolean"
+              },
+              "isDefaultProfileImage": {
+                "type": "boolean"
+              },
+              "isFollowRequestSent": {
+                "type": "boolean"
+              },
+              "isGeoEnabled": {
+                "type": "boolean"
+              },
+              "isProtected": {
+                "type": "boolean"
+              },
+              "isVerified": {
+                "type": "boolean"
+              },
+              "listedCount": {
+                "type": "long"
+              },
+              "location": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileBackgroundColor": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileBackgroundImageUrl": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileBackgroundImageUrlHttps": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileBackgroundTiled": {
+                "type": "boolean"
+              },
+              "profileBannerImageUrl": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileImageUrl": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileImageUrlHttps": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileLinkColor": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileSidebarBorderColor": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileSidebarFillColor": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileTextColor": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "profileUseBackgroundImage": {
+                "type": "boolean"
+              },
+              "screenName": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "showAllInlineMedia": {
+                "type": "boolean"
+              },
+              "statusesCount": {
+                "type": "long"
+              },
+              "timeZone": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "translator": {
+                "type": "boolean"
+              },
+              "url": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "utcOffset": {
+                "type": "long"
+              }
+            }
+          },
+          "userMentionEntities": {
+            "properties": {
+              "end": {
+                "type": "long"
+              },
+              "id": {
+                "type": "long"
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "screenName": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "start": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
