@@ -148,8 +148,8 @@ public class TweetsAnalysisPipeline {
 			}
 		});
 
-		//JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");
-		processedTweets.print();
+		JavaEsSparkStreaming.saveJsonToEs(processedTweets, "tweets/tweet");
+		//processedTweets.print();
 
 		tweetsReceiver.getJavaStreamingContext().start();
 
