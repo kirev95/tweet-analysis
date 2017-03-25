@@ -2,7 +2,7 @@ package com.sparkstreaminganalytics.twitter;
 
 import junit.framework.TestCase;
 
-public class SentimentTest extends TestCase {
+public class NLPTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();

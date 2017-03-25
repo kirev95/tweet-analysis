@@ -19,8 +19,9 @@ abstract public class TwitterMetrics {
 	public static void updateApproximateTotalEngagement(Status status, JSONObject TweetStatusJsonObject, String keyword){
 		if ((status.getRetweetedStatus() != null) && (TweetStatusJsonObject.getJSONObject("retweetedStatus")
 				.getJSONArray("userMentionEntities").toString().contains(keyword)
-				|| TweetStatusJsonObject.getJSONArray("urlEntities").toString().contains(keyword))) {
-
+				|| TweetStatusJsonObject.getJSONObject("retweetedStatus").getJSONArray("urlEntities").toString().contains(keyword)
+				|| TweetStatusJsonObject.getJSONObject("retweetedStatus").getJSONArray("hashtagEntities").toString().contains(keyword))){
+			
 			if (retweetIdsSet.add(TweetStatusJsonObject.getJSONObject("retweetedStatus").getLong("id"))) {
 				
 				// Mark the retweet as the first one received with this ID.
