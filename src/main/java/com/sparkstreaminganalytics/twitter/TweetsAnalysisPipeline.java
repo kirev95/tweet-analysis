@@ -180,32 +180,4 @@ public class TweetsAnalysisPipeline {
 			System.exit(0);
 		}
 	}
-	
-	private static void removeUselessUserFields(JSONObject TweetStatusJsonObject){
-		TweetStatusJsonObject.getJSONObject("user").remove("showAllInlineMedia");
-		TweetStatusJsonObject.getJSONObject("user").remove("isVerified");
-		TweetStatusJsonObject.getJSONObject("user").remove("translator");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileTextColor");
-		TweetStatusJsonObject.getJSONObject("user").remove("descriptionURLEntities");
-		TweetStatusJsonObject.getJSONObject("user").remove("screenName");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileUseBackgroundImage");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundTiled");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundImageUrl");
-		TweetStatusJsonObject.getJSONObject("user").remove("isProtected");
-		TweetStatusJsonObject.getJSONObject("user").remove("isFollowRequestSent");
-		TweetStatusJsonObject.getJSONObject("user").remove("isContributorsEnabled");
-		TweetStatusJsonObject.getJSONObject("user").remove("isDefaultProfile");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileImageUrl");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileSidebarBorderColor");
-		TweetStatusJsonObject.getJSONObject("user").remove("utcOffset");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundImageUrlHttps");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileBackgroundColor");
-		TweetStatusJsonObject.getJSONObject("user").remove("timeZone");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileLinkColor");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileBannerImageUrl");
-		TweetStatusJsonObject.getJSONObject("user").remove("listedCount");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileSidebarFillColor");
-		TweetStatusJsonObject.getJSONObject("user").remove("profileImageUrlHttps");
-		TweetStatusJsonObject.getJSONObject("user").remove("name");
-	}
 }

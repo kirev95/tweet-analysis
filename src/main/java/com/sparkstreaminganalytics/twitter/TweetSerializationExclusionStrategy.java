@@ -38,7 +38,6 @@ public class TweetSerializationExclusionStrategy implements ExclusionStrategy {
 	        case "translator": return true;
 	        case "profileTextColor": return true;
 	        case "descriptionURLEntities": return true;
-	        case "screenName": return true;
 	        case "profileUseBackgroundImage": return true;
 	        case "profileBackgroundTiled": return true;
 	        case "profileBackgroundImageUrl": return true;
