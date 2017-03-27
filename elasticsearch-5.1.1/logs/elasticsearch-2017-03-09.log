@@ -1,0 +1,56 @@
+[2017-03-09T04:44:25,883][INFO ][o.e.n.Node               ] [] initializing ...
+[2017-03-09T04:44:26,275][INFO ][o.e.e.NodeEnvironment    ] [e1S9kLk] using [1] data paths, mounts [[/ (/dev/sda5)]], net usable_space [186.3gb], net total_space [232.4gb], spins? [possibly], types [ext4]
+[2017-03-09T04:44:26,276][INFO ][o.e.e.NodeEnvironment    ] [e1S9kLk] heap size [1.9gb], compressed ordinary object pointers [true]
+[2017-03-09T04:44:26,672][INFO ][o.e.n.Node               ] node name [e1S9kLk] derived from node ID [e1S9kLkiRTe8EA6bNImzaw]; set [node.name] to override
+[2017-03-09T04:44:26,674][INFO ][o.e.n.Node               ] version[5.1.1], pid[16249], build[5395e21/2016-12-06T12:36:15.409Z], OS[Linux/4.4.0-64-generic/amd64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_111/25.111-b14]
+[2017-03-09T04:44:28,363][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [aggs-matrix-stats]
+[2017-03-09T04:44:28,363][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [ingest-common]
+[2017-03-09T04:44:28,363][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-expression]
+[2017-03-09T04:44:28,363][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-groovy]
+[2017-03-09T04:44:28,363][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-mustache]
+[2017-03-09T04:44:28,364][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-painless]
+[2017-03-09T04:44:28,364][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [percolator]
+[2017-03-09T04:44:28,364][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [reindex]
+[2017-03-09T04:44:28,364][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [transport-netty3]
+[2017-03-09T04:44:28,364][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [transport-netty4]
+[2017-03-09T04:44:28,365][INFO ][o.e.p.PluginsService     ] [e1S9kLk] no plugins loaded
+[2017-03-09T04:44:35,868][INFO ][o.e.n.Node               ] initialized
+[2017-03-09T04:44:35,869][INFO ][o.e.n.Node               ] [e1S9kLk] starting ...
+[2017-03-09T04:44:36,270][INFO ][o.e.t.TransportService   ] [e1S9kLk] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
+[2017-03-09T04:44:39,468][INFO ][o.e.c.s.ClusterService   ] [e1S9kLk] new_master {e1S9kLk}{e1S9kLkiRTe8EA6bNImzaw}{XmDfjds8RgOaiomgBSTkUQ}{127.0.0.1}{127.0.0.1:9300}, reason: zen-disco-elected-as-master ([0] nodes joined)
+[2017-03-09T04:44:39,670][INFO ][o.e.h.HttpServer         ] [e1S9kLk] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
+[2017-03-09T04:44:39,670][INFO ][o.e.n.Node               ] [e1S9kLk] started
+[2017-03-09T04:44:40,825][INFO ][o.e.g.GatewayService     ] [e1S9kLk] recovered [5] indices into cluster_state
+[2017-03-09T04:44:48,575][INFO ][o.e.c.r.a.AllocationService] [e1S9kLk] Cluster health status changed from [RED] to [YELLOW] (reason: [shards started [[spark][2]] ...]).
+[2017-03-09T05:15:36,908][INFO ][o.e.n.Node               ] [e1S9kLk] stopping ...
+[2017-03-09T05:15:37,930][INFO ][o.e.n.Node               ] [e1S9kLk] stopped
+[2017-03-09T05:15:37,931][INFO ][o.e.n.Node               ] [e1S9kLk] closing ...
+[2017-03-09T05:15:37,957][INFO ][o.e.n.Node               ] [e1S9kLk] closed
+[2017-03-09T15:20:46,941][INFO ][o.e.n.Node               ] [] initializing ...
+[2017-03-09T15:20:47,309][INFO ][o.e.e.NodeEnvironment    ] [e1S9kLk] using [1] data paths, mounts [[/ (/dev/sda5)]], net usable_space [185.9gb], net total_space [232.4gb], spins? [possibly], types [ext4]
+[2017-03-09T15:20:47,309][INFO ][o.e.e.NodeEnvironment    ] [e1S9kLk] heap size [1.9gb], compressed ordinary object pointers [true]
+[2017-03-09T15:20:47,638][INFO ][o.e.n.Node               ] node name [e1S9kLk] derived from node ID [e1S9kLkiRTe8EA6bNImzaw]; set [node.name] to override
+[2017-03-09T15:20:47,639][INFO ][o.e.n.Node               ] version[5.1.1], pid[3996], build[5395e21/2016-12-06T12:36:15.409Z], OS[Linux/4.4.0-66-generic/amd64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_111/25.111-b14]
+[2017-03-09T15:20:49,246][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [aggs-matrix-stats]
+[2017-03-09T15:20:49,246][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [ingest-common]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-expression]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-groovy]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-mustache]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [lang-painless]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [percolator]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [reindex]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [transport-netty3]
+[2017-03-09T15:20:49,247][INFO ][o.e.p.PluginsService     ] [e1S9kLk] loaded module [transport-netty4]
+[2017-03-09T15:20:49,248][INFO ][o.e.p.PluginsService     ] [e1S9kLk] no plugins loaded
+[2017-03-09T15:20:54,516][INFO ][o.e.n.Node               ] initialized
+[2017-03-09T15:20:54,516][INFO ][o.e.n.Node               ] [e1S9kLk] starting ...
+[2017-03-09T15:20:54,977][INFO ][o.e.t.TransportService   ] [e1S9kLk] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
+[2017-03-09T15:20:58,094][INFO ][o.e.c.s.ClusterService   ] [e1S9kLk] new_master {e1S9kLk}{e1S9kLkiRTe8EA6bNImzaw}{nOUn-PCVR_adV8-h7ZzY6A}{127.0.0.1}{127.0.0.1:9300}, reason: zen-disco-elected-as-master ([0] nodes joined)
+[2017-03-09T15:20:58,203][INFO ][o.e.h.HttpServer         ] [e1S9kLk] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
+[2017-03-09T15:20:58,203][INFO ][o.e.n.Node               ] [e1S9kLk] started
+[2017-03-09T15:20:59,510][INFO ][o.e.g.GatewayService     ] [e1S9kLk] recovered [5] indices into cluster_state
+[2017-03-09T15:21:08,275][INFO ][o.e.c.r.a.AllocationService] [e1S9kLk] Cluster health status changed from [RED] to [YELLOW] (reason: [shards started [[spark][2]] ...]).
+[2017-03-09T15:55:55,704][INFO ][o.e.n.Node               ] [e1S9kLk] stopping ...
+[2017-03-09T15:55:57,706][INFO ][o.e.n.Node               ] [e1S9kLk] stopped
+[2017-03-09T15:55:57,707][INFO ][o.e.n.Node               ] [e1S9kLk] closing ...
+[2017-03-09T15:55:57,739][INFO ][o.e.n.Node               ] [e1S9kLk] closed
